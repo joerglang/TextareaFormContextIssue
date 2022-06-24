@@ -1,0 +1,74 @@
+﻿@page "/"
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>EditContext error sample</PageTitle>
+
+<h1>IsModified and textarea not working together</h1>
+
+@if (string.IsNullOrEmpty(FormSubmitMessage))
+{
+    <EditForm Model="@FormModel" Context="myContext" OnValidSubmit="@OnFormSubmit" OnInvalidSubmit="@OnInvalidSubmit">
+        <DataAnnotationsValidator />
+
+
+        <div class="alert alert-info">Edit Context IsModified: @myContext.IsModified()</div>
+
+        <div class="row">
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Example Input</label>
+                <CustomInputText type="text" autocomplete="off" class="form-control" id="exampleFormControlInput1"
+                       @bind-Value="FormModel.Text" />
+            </div>
+            <div class="mb-3">
+                <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label>
+                <CustomInputTextarea class="form-control" id="exampleFormControlTextarea1" rows="3"
+                           @bind-Value="FormModel.Description"/>
+            </div>
+            <div class="mb-3">
+                <button type="submit">Submit</button>
+                <ValidationSummary />
+            </div>
+        </div>
+
+
+    </EditForm>
+}
+else
+{
+    <div class="alert alert-success" role="alert">
+        @FormSubmitMessage
+    </div>
+}
+
+@code
+{
+
+    public class Test
+    {
+        [Required]
+        public string Text { get; set; } = String.Empty;
+
+        [Required]
+        [MaxLength(50, ErrorMessage = "The description should be at most 50 characters.")]
+        public string Description { get; set; } = String.Empty;
+    }
+
+    public Test FormModel = new Test();
+    public string FormSubmitMessage { get; set; } = String.Empty;
+
+    private async Task OnFormSubmit()
+    {
+        FormSubmitMessage = "Form submitted successfully!";
+        await Task.Delay(3000);
+        FormModel.Text = "";
+        FormModel.Description = "";
+        FormSubmitMessage = "";
+
+        StateHasChanged();
+    }
+
+    private void OnInvalidSubmit()
+    {
+        FormSubmitMessage = "";
+    }
+}
